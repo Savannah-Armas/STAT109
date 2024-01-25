@@ -1,0 +1,95 @@
+#Patterned Data 
+1:10
+1:1000
+#The output in the console shows the value number/count in the left handle []
+seq(from = 5, to =25, by =4)
+
+#String concatenation is a way of appending two or more strings into a single
+#...string whether it is character by character or using some special character 
+#...end to end.
+rep(c(2, 3, 5), 3)
+
+#Data Vector
+x <- 1:10
+x
+y <- 21:30
+y
+x+y
+
+points <- c(35, 27, 12, 15, 19)
+players <- c('Tatum', 'Brown', 'White', 'Holiday', 'Horford')
+
+#Data Frame
+mydata <- data.frame(players, points)
+str(mydata)
+
+#Functions
+names(mydata)
+dim(mydata)
+summary(mydata)
+
+#Data: Shows all data sets available in R
+data()
+#Opening up a sample data set offered by R
+data('iris')
+#Prompting ? or in this ex. ?iris DIRECTLY IN CONSOLE
+#...acts as the .help function for more info in R
+str(iris)
+
+#Importing course data set using .CVS link - Boston Celtics Data
+bos <- read.csv('https://raw.githubusercontent.com/bkrai/Sports-Analytics-With-R/main/2022BOS.csv')
+str(bos)
+#Head: specifies first 6 variables of all columns
+head(bos)
+#Head: specifies first 3 variables of all columns, as requested
+head(bos, 3)
+summary(bos$pctFG)
+
+#Pie Chart
+tab <- table(bos$slugOpponent)
+pie(tab,
+    col = rainbow(30),
+    main = 'Games Against Opponents')
+
+#Bar Plot
+barplot(tab,
+        col = rainbow(30),
+        main = 'Games Against Opponents',
+        las = 2)
+  #las 1 is horizontal, 2 is vertical for label positioning
+
+#Histogram
+hist(bos$pts,
+     col = 'darkgreen',
+     xlab = 'Points Scored',
+     main = 'Points Per Player Per Game')
+  #xlab is for labeling the x-axis
+
+#Scatter: ~ denotes points scored (x-axis) VERSUS minutes (y-axis)
+plot(pts ~ minutes, bos)
+
+#Library: Go to 4th window Packages Install first 
+library(psych)
+#pairs.panels displays histogram and correlation matrix for data specified
+# ...[] denotes specific columns requested
+pairs.panels(bos[,30:35])
+
+#Installing textbook library 
+install.packages("DAAG")
+library(DAAG)
+
+#Missing Data
+mean(bos$pctFT)
+summary(bos$pctFT)
+  #The 'NA' notes that there are 434 missing values
+mean(bos$pctFT, na.rm = T)
+sd(bos$pctFT, na.rm = T)
+
+#Generate all rows with missing values
+bos[!complete.cases(bos), ] 
+dim(bos)
+
+#na.omit omitted all rows with missing data
+new <- na.omit(bos)
+dim(new)
+summary(new)
