@@ -1,0 +1,146 @@
+# Libraries
+library(MASS)
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+library(psych)
+library(ggExtra)
+
+# Data
+bos <- read.csv('https://raw.githubusercontent.com/bkrai/Sports-Analytics-With-R/main/2022BOS.csv')
+str(bos)
+max(bos$numberGameTeamSeason)
+table(bos$numberGameTeamSeason)
+table(bos$numberGameTeamSeason, bos$outcomeGame)
+
+# Select
+bos %>% select(23, 31:35)
+
+# Filter
+bos %>% select(23, 31:35) %>% 
+  filter(namePlayer == 'Jayson Tatum')
+
+# Arrange
+bos %>% select(23, 31:35) %>% 
+  filter(namePlayer == 'Jayson Tatum') %>% 
+  arrange(desc(fg3m))
+
+# Summarise
+bos %>% filter(outcomeGame == 'L' & namePlayer == 'Jayson Tatum') %>% 
+  summarise(Avg = mean(plusminus),
+            sd = sd(plusminus),
+            count = n())
+
+# Group by
+bos %>% filter(outcomeGame == 'L') %>% 
+  group_by(namePlayer) %>% 
+  summarise(Avg = mean(plusminus),
+            sd = sd(plusminus),
+            count = n()) %>% 
+  arrange(desc(Avg))
+
+# GGPLOT2
+# Histogram
+bos %>% ggplot(aes(x = plusminus, fill = outcomeGame)) +
+  geom_histogram(alpha = 0.5, color = 'black', bins = 10) +
+  ggtitle('Player point diffrential in a Win/Loss') +
+  facet_wrap(~outcomeGame) +
+  theme_bw()
+
+# Histogram - grid
+bos %>% ggplot(aes(x = plusminus, fill = outcomeGame)) +
+  geom_histogram(alpha = 0.5, color = 'black', bins = 10) +
+  ggtitle('Player point diffrential in a Win/Loss') +
+  facet_grid(vars(outcomeGame), vars(locationGame)) +
+  theme_bw()
+
+# Density
+bos %>% ggplot(aes(x = plusminus, fill = outcomeGame)) +
+  geom_density(alpha = 0.5, color = 'black', bins = 10) +
+  ggtitle('Player point diffrential in a Win/Loss') +
+ facet_wrap(~outcomeGame) +
+  theme_bw()
+
+# Histogram with density
+bos %>% ggplot(aes(x = plusminus, fill = outcomeGame)) +
+  geom_histogram(alpha = 0.5, color = 'black', bins = 10) +
+  ggtitle('Player point diffrential in a Win/Loss') +
+  facet_wrap(~outcomeGame) +
+  theme_bw() +
+  geom_density(aes(y = 8* ..count..), alpha = 0.6)
+
+# Scatter
+bos %>% ggplot(aes(x = minutes, y = pts)) +
+  geom_point(alpha = 0.6, color = 'darkblue') +
+  ggtitle('Minutes Vs Points Scored')
+
+bos %>% ggplot(aes(x = fta, y = ftm)) +
+  geom_point(alpha = 0.6, color = 'darkblue') +
+  ggtitle('Minutes Vs Points Scored')
+
+# Scatter with trend
+bos %>% ggplot(aes(x = minutes, y = pts)) +
+  geom_point(alpha = 0.6, color = 'darkblue') +
+  ggtitle('Minutes Vs Points Scored') +
+  geom_smooth(se=0, method = 'lm')
+
+# Scatter with 2 trend lines
+bos %>% ggplot(aes(x = minutes, y = pts, col = outcomeGame, size = fta)) +
+  geom_point(alpha = 0.6, color = 'darkblue') +
+  ggtitle('Minutes Vs Points Scored') +
+  geom_smooth(se=0, method = 'lm')
+
+# Scatter facet wrap
+bos %>% ggplot(aes(x = minutes, y = pts, col = outcomeGame, size = fta)) +
+  geom_point(alpha = 0.6, color = 'darkblue') +
+  ggtitle('Minutes Vs Points Scored') +
+  geom_smooth(se=0, method = 'lm') +
+  facet_wrap(~outcomeGame)
+
+# Scatter with log scale
+bos %>% ggplot(aes(x = minutes, y = pts, col = outcomeGame, size = fta)) +
+  geom_point(alpha = 0.6, color = 'darkblue') +
+  ggtitle('Minutes Vs Points Scored') +
+  geom_smooth(se=0, method = 'lm') +
+  facet_wrap(~outcomeGame) +
+  scale_y_log10()
+
+# Barplot
+new <- bos %>% group_by(namePlayer) %>% 
+  summarise(EFG = (sum(fgm) + 0.5*sum(fg3m))/ sum(fga),
+            count = n()) %>% 
+  filter(count > 10) %>% 
+  arrange(desc(EFG))
+
+new %>% ggplot(aes(x = factor(namePlayer), y = EFG)) +
+  geom_col() +
+  coord_flip() +
+  ggtitle('Effective Field Goals')
+
+# Boxplot
+bos %>% filter(minutes > 5) %>% 
+  ggplot(aes(x = namePlayer, y = pts)) +
+  geom_boxplot() +
+  coord_flip()
+
+bos %>% filter(minutes > 5) %>% 
+  ggplot(aes(x = interaction(namePlayer, outcomeGame), y = pts, fill = outcomeGame)) +
+  geom_boxplot() +
+  coord_flip()
+
+# Marginal plot
+p <- ggplot(bos, aes(x=minutes, y = pts)) +
+  geom_point() +
+  geom_smooth(se = 0)
+ggMarginal(p, type = 'histogram', fill = 'pink')
+
+# Correlation
+data <- bos[c(32:34, 37:40)]
+cor(data)
+
+round(cor(data), digits = 3)
+corrplot(cor(data),
+         method = 'number',
+         type = 'upper')
+
+pairs.panels(data, method = 'kendall')
