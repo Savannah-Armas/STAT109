@@ -1,0 +1,141 @@
+---
+title: "Section 2: Exploratory Data Analysis & Data Visualization"
+author: "Dikhit, Anshuman"
+date: "2/3/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## EDA
+
+- Critical process of initial investigations to understand data
+
+- Effective modeling only possible with knowledge of data (aka – Domain Knowledge)
+
+- EDA is an open-ended process – different for each person
+
+- Data Summary and Data Visualization are powerful EDA tools
+
+## Practice Code
+
+Necessary Packages
+
+```{r}
+library(nycflights13)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+data(flights)
+```
+
+## Data Manipulation
+
+Before we begin working with the data, don’t forget to do `?flights` to learn about the different variables in the dataset.
+
+How many flights were there in July?
+```{r}
+sum(flights$month == 7)
+```
+```{r}
+flights %>% filter(month == 7) %>% summarise(count=n())
+```
+
+How many flights were there on my birthday, July 2nd?
+```{r}
+jul.2.flights <- flights %>% filter(month == 7, day == 2)
+```
+
+Find the mean and standard deviation of the amount of time spent in the air.
+```{r}
+mean(flights$air_time, na.rm = TRUE)
+sd(flights$air_time, na.rm = TRUE)
+```
+
+```{r}
+flights %>% summarise(Mean=mean(air_time, na.rm=TRUE), SD = sd(air_time, na.rm=TRUE))
+```
+
+How many flights have carrier as UA?
+```{r}
+sum(flights$carrier == "UA")
+```
+
+What is the average departure delay when the destination is HOU?
+```{r}
+mean(flights$dep_delay[flights$dest == "HOU"], na.rm=TRUE)
+```
+
+Which destination has the highest average departure delay?
+```{r}
+flights %>% group_by(dest) %>% 
+  summarise(Mean = mean(dep_delay, na.rm=TRUE)) %>%
+  arrange(desc(Mean)) %>% 
+  top_n(3)
+```
+
+What is the usual name (as per the `airports` dataset) for the destination with the highest average departure delay?
+
+
+
+Which origin has the highest number of flights?
+```{r}
+table(flights$origin)
+```
+
+
+## Graphing Data
+
+We have learned about various types of plots, but it is important that we understand when each type of plot is appropriate for our data.
+
+What type of graphs are appropriate for categorical variables?
+
+Histograms, bargraphs, boxplots
+
+What types of graphs are appropriate for quantitative variables?
+Scatterplots
+
+
+A particular characteristic that we look for in graphs in skewness. Determine the relationship between the mean and median for each option below.
+
+Right/positive skew: 
+Left/negative skew: 
+Symmetric: They're about the same
+
+Now, let’s practice graphing!
+
+
+Which origin airport has the greatest outlier on a boxplot for departure delay?
+```{r}
+flights %>% filter(dep_delay < 25) %>% ggplot(aes(x=origin, y=dep_delay)) +
+  geom_boxplot() +
+  labs(y = "Departure Delay", x = "Origin NYC Airport") + 
+  ggtitle("Departure Delay by Origin Airport")
+```
+
+Use a histogram to determine if there is skewness in the amount of time spent in the air.
+```{r}
+flights %>% ggplot(aes(x=air_time)) +
+  geom_histogram(alpha = 0.5, binwidth = 20, color = "black")
+```
+
+Examine the relationship between the amount of time spent in the air and the distance between airports, graphically.
+
+```{r}
+flights %>% ggplot(aes(x=air_time, y=distance, color=origin)) + 
+  geom_point() + 
+  labs(x = "Air Time", y = "Distance between Airports") + 
+  ggtitle("Amount of air time vs Distance between airports") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+Miscellaneous questions after lecture code
+```{r}
+data = flights %>% select(air_time, distance)
+cor(na.omit(data))
+```
