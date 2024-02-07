@@ -1,0 +1,100 @@
+# Quiz 1
+library(dplyr)
+library(ggplot2)
+library(nycflights13)
+data("flights")
+
+#Which carrier has the highest number of flights?
+table(flights$carrier)
+# Answer:UA
+
+#Number of flights in month 3 are:
+sum(flights$month == 3)
+# Answer: 28834
+
+# TEST - Which origin airport has the maximum flights delayed with delay time more than 60 minutes.
+flights %>% filter(dep_delay > 60)  %>% 
+  group_by(origin) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+# Answer: EWR
+
+flights %>% filter(dep_delay > 300, month == 1)  %>% 
+  ggplot(aes(x=dep_delay, y=arr_delay)) +
+  geom_point()
+
+#How many flights have destination as ANC?
+sum(flights$dest == 'ANC')
+table(flights$dest)
+# Answer: less than 200
+
+#Which airline carrier shows possible outlier on a boxplot for distance?
+flights %>% ggplot(aes(x=carrier, y=distance)) +
+  geom_boxplot()
+# Answer:AA
+
+#Number of flights in month 10 are:
+sum(flights$month == 10)
+# Answer:28889
+
+flights %>% ggplot(aes(x=origin, y=distance)) +
+  geom_histogram()
+
+flights %>% ggplot(aes(x=distance)) +
+  geom_histogram(alpha = 0.5, binwidth = 20, color = "black")
+
+#Find standard deviation of dep_delay.
+sd(flights$dep_delay, na.rm = TRUE)
+# Answer: greater than 20 minutes
+
+#Number of flights in month 12, and on day 30 are:
+q13 <- flights %>% filter(month == 12, day == 30)
+# Answer: 968
+
+#Number of flights in month 7 are:
+sum(flights$month == 7)
+# Answer: 29425
+
+#Which origin airport has the maximum number of flights having early departures?
+flights %>% group_by(origin) %>% 
+  summarise(Mean = mean(dep_delay, na.rm=TRUE)) %>%
+  arrange((Mean)) %>% 
+  top_n(3)
+# Answer: LGA
+
+#Which arrival destination has the second highest arr_delay standard deviation?
+flights %>% group_by(dest) %>% 
+  summarise(sd = sd(arr_delay, na.rm=TRUE)) %>%
+  arrange(desc(sd)) %>% 
+  top_n(3)
+# Answer: TUL
+
+#Which plane tail number has the highest mean arrival delay?
+flights %>% group_by(tailnum) %>% 
+  summarise(Mean = mean(arr_delay, na.rm=TRUE)) %>%
+  arrange(desc(Mean)) %>% 
+  top_n(3)
+# Answer: N844MH
+
+#For DL as carrier, which origin has the highest average departure delay?
+table(flights$dest[flights$carrier == "DL"])
+# Answer: EWR
+
+flights %>% group_by(origin) %>% (flights$carrier == 'DL') %>% 
+  summarise(Mean = mean(dep_delay, na.rm=TRUE)) %>%
+  arrange(desc(Mean)) %>% 
+  top_n(3)
+
+flights %>% group_by(origin) %>% 
+  summarise(Mean = mean(dep_delay, na.rm=TRUE)) %>%
+  arrange(desc(Mean)) %>% 
+  top_n(3)
+
+flights %>% group_by(origin) %>% 
+  summarise(Mean = mean(flights$dep_delay[flights$carrier == "DL"], na.rm=TRUE)) %>%
+  arrange(desc(Mean)) %>% 
+  top_n(3)
+
+#What is the average distance (miles) between airports when destination is ATL?
+mean(flights$distance[flights$dest == "ATL"], na.rm=TRUE)
+# Answer: 757
