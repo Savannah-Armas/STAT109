@@ -1,0 +1,168 @@
+---
+title: "Homework-2-S_Armas"
+output:
+  pdf_document:
+    latex_engine: xelatex
+date: "2024-02-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## PART 1 (30 points)
+#Use y <- rnorm(100) to generate a random sample of size 100 from a normal distribution.(a) Calculate the mean and standard deviation of y. (b) Use a loop to repeat the above calculation 30 times. Store the 30 means in a vector named AVG. Calculate the standard deviation of the values in AVG. (c) Run (b) 4 times, showing each of the distributions of 30 means in a normal probability plot and box plot
+
+### Code Part 1a)
+
+```{r}
+y <- rnorm(100)
+y_mean <- mean(y)
+y_sd <- sd(y)
+y_mean
+y_sd
+```
+### Comment 1a)
+As demonstrated above, the random sample size of 100 from a normal distribution resulted in a mean value of 0.0081 and a standard deviation of 1.02053.
+
+### Code Part 1b) and 1c)
+```{r}
+# Generate 30 means from 100 random samples
+n_samples <- 100 # sample size
+n_repeats <- 30 # number of repeats
+AVG <- numeric(n_repeats)
+
+set.seed(123) # for reproducibility
+for (i in 1:n_repeats) {
+  y <- rnorm(n_samples)
+  AVG[i] <- mean(y)
+}
+
+# Plot the distribution of the means
+par(mfrow=c(1,2)) # set up a 1x2 grid of plots
+qqnorm(AVG, main="Normal Probability Plot of Means")
+qqline(AVG)
+boxplot(AVG, main="Box Plot of Means", ylab="Mean")
+par(mfrow=c(1,1)) # reset to a single plot
+
+# Calculate the standard deviation of the means
+sd_AVG <- sd(AVG)
+cat("Standard deviation of the means (AVG):", sd_AVG)
+```
+
+### Comment 1b) 
+As printed in the console, the standard deviation of the means (AVG): 0.08679486.
+
+### Comment 1c)
+To begin, Central Limit Theorem (CLM) states: "The sampling distribution of the mean will always be normally distributed, as long as the sample size is large enough." 
+Understanding these principles and applying them to the above graphics, we can visually interpret that our random sample size of 100 from a normal distribution resulted in a mean value of 0.0081 and a standard deviation of 1.02053. A normal distribution hold that the mean be equal to zero and the standard deviation be equal to 1 traditionally, so the results are relatively in line with these standards and the distribution is roughly normal.
+
+## PART 2 (30 points) 
+###Use mfrow to set up the layout for a 3 by 4 array of plots. In the top 4 panels, show normal probability plots for 4 separate “random” samples of size 10, all from a normal distribution. In the middle 4 panels, display plots for samples of size 100. In the bottom 4 panels, display plots for samples of size 1000. How does the appearance of plots change as the sample size changes?
+
+### Part 2 code
+```{r}
+par(mfrow = c(3,4)) 
+
+sample_size <- c(10,100, 1000)
+for (size in sample_size) {
+  for (i in 1:4) {
+    sample_data <- rnorm(size)
+    qqnorm(sample_data, main = paste("Sample Size:", size))
+    qqline(sample_data)
+  }
+}
+```
+
+### Part 2 Comment
+In the top 4 panels, we observe normal probability plots for 4 separate “random” samples of size 10,100, and 1000 all from a normal distribution.The appearance of plots changes as the sample size increases as shown by improved fit/accuracy of the normal probability plots. That is, as sample size increases the overall distribution of the sample mean will have a 'normal' fit. 
+
+## PART 3 (30 points)
+### The statement x <- rchisq(n, 1) generates n random values from a chi-squared distribution with one degree of freedom. The statement x <- rt(n, 1) generates n random values from a t-distribution with one degree of freedom. Make normal probability plots using 30 random values for various degrees of freedom from each of these distributions. Approximately how large degrees of freedom is necessary, in each instance, to obtain a consistent normal distribution shape?
+
+```{R}
+# Chi-squared distribution
+set.seed(123) # for reproducibility
+par(mfrow=c(2,3)) # set up a 2x3 grid of plots
+for (df in c(1, 5, 10, 25, 50, 100)) {
+  x <- rchisq(30, df)
+  qqnorm(x, main=paste("df =", df))
+  qqline(x)
+}
+
+# T-distribution
+par(mfrow=c(2,3)) # reset to a single plot
+for (df in c(1, 5, 10, 25, 50, 100)) {
+  x <- rt(30, df)
+  qqnorm(x, main=paste("df =", df))
+  qqline(x)
+}
+```
+
+
+### Part 3 Comment 
+It is evident for both the chi-squared and t-distribution, that as the degrees of freedom increase the consistency of normal distribution shape improves. 
+Beginning with the chi-squared distribution, the degrees of freedom showed best fit around 25. Whereas for the t-distribution, the degrees of freedom showed best fit around 25 as well.
+
+
+## Part 4
+### A bank has kept records of the checking balances of its customers and determined that the average daily balance of its customers is $350 with a standard deviation of $58. A random sample of 144 checking accounts is selected. a) What is the probability that the sample mean will be less than $356.60? b) What is the probability that the sample mean will lie between $340 and $350?
+
+### Part 4a) Code
+```{r}
+# z = (356.60 - 350) / (58/sqrt144)
+# z = 1.14
+# Define the parameters
+mean <- 350
+sd <- 58
+n <- 144
+
+# Calculate the sample mean
+sample_mean <- mean + (sd / sqrt(n)) * qnorm(0.95) # where 0.95 corresponds to the z-score of 1.645
+
+# Calculate the probability that the sample mean will be less than $356.60
+prob <- pnorm((356.60 - mean) / (sd / sqrt(n)))
+
+# Print the result
+print(prob)
+```
+
+### Part 4a) Comment
+As demonstrated above, the probability that the sample mean will be less than $356.60 is approximately 0.9139 or 91.4%.
+
+### Part 4b) Code
+```{r}
+# z1 = (340 - 350) / (58/sqrt144) z1 ≈ -1.14
+# z2 = (350 - 350) / (58/sqrt144) z2 ≈ 0
+
+# Load the stats package
+library(stats)
+
+# Define the parameters
+mean <- 350
+std_dev <- 58
+sample_size <- 144
+
+# Define the bounds
+lower_bound <- 340
+upper_bound <- 350
+
+# Calculate the z-scores
+z1 <- (lower_bound - mean) / (std_dev / sqrt(sample_size))
+z2 <- (upper_bound - mean) / (std_dev / sqrt(sample_size))
+
+# Calculate the probability using the pnorm function
+probability <- pnorm(z2, mean = 0, sd = 1) - pnorm(z1, mean = 0, sd = 1)
+
+# Print the probability
+print(probability)
+
+```
+
+### Part 4b) Comment
+As reflected by the resuts shown above, the probability that the sample mean will lie between $340 and $350 is 0.4807 or 48.07%
+
+
+
+
