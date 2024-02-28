@@ -1,0 +1,217 @@
+---
+title: 'STAT E109 Midterm Review Handout'
+output:
+  pdf_document: default
+  word_document: default
+---
+
+
+# Part 1: Thought Questions - Very Few Calculations Required
+
+1. Which of the following is an example of inferential statistics?
+
+    a) Creating a histogram of residential housing prices in a given zip code.
+    b) Calculating the population mean of residential housing prices from all the residential houses in a given zip code.
+    c) Calculating the median of residential housing prices from a sample set in a given zip code.
+ANSWER -> d) Predicting average housing price based on square footage of homes.
+    
+2. True or False. If the median is greater than the mean of a sample set, then the distribution is right-skewed.
+ANSWER -> False
+
+3. What does it mean when we say that the 95\% confidence interval for a population mean,$\mu$, is between 33.8 and 39.0?
+About 5% of the time the population mean does not fall within the range. 
+
+4. How do you determine the degrees of freedom for a t-distribution? How do you determine the degrees of freedom for a contingency table?
+11 Rows
+11 Columns
+The degrees of freedom of contigency table = (row - 1)*(column -1)
+=(11-1)*(11-1)
+ANSWER -> 100 degrees of freedom 
+
+residuals = n - k -1
+10 - 1 - 1 = 8
+6 obs 
+
+5. Describe the difference between the margin of error of a confidence interval and the standard error of the mean. 
+margin of error is multiplied by the number of standard deviations away from the mean- 1.96
+
+6. An analyst, using a random sample of n = 500 families, obtained a 90 percent confidence interval for mean monthly family income for a large population: (\$600, \$800). If the analyst had used a 99 percent confidence coefficient instead, the confidence interval would be: 
+
+    a) Narrower and would involve a larger risk of being incorrect. 
+    ANSWER -> b) Wider and would involve a smaller risk of being incorrect. 
+    c) Narrower and would involve a smaller risk of being incorrect.
+    d) Wider and would involve a larger risk of being incorrect. 
+    e) Wider but it cannot be determined whether the risk of being incorrect would be larger or smaller.
+
+7. Which of the following correctly describes the relationship between sample size and standard error of the mean?
+
+    a) Increasing sample size increases standard error.
+    ANSWER -> b) Increasing sample size decreases standard error. 
+    c) Sample size and standard error are not related.
+
+
+8. Two confidence interval estimates from the same sample are (16.4,29.8) and (14.3,31.9). What is the sample mean, and if one estimate is at  the 95\% level while the other is at the 99% level, which is which?
+ANSWER -> (16.4,29.8) is at the 95% level and (14.3,31.9)is at the 99% level.
+
+9. According the the U.S. Department of Education, the salary of full-time graduate students is normally distributed with a mean of \$12800 and standard deviation of \$1800. Which of the following would be used to calculate the probability that a randomly selected full-time graduate student in the U.S. will have a salary of at least /$15000? 
+HINT: 'At Least' = area to the right
+
+    a. pnorm((15000-12800)/1800)
+    b. pnorm((12800-15000)/1800)
+    ANSWER - > c. 1-pnorm((15000-12800)/1800)
+    d. 1-pnorm((12800-15000)/1800)
+
+```{r,warnings=FALSE,message=FALSE}
+    library(BSDA)
+    1-pnorm((15000-12800)/1800)
+    1-pnorm((12800-15000)/1800)
+```
+10. As our test statistic increases, our p-value decreases. This means that with a smaller p-value we
+
+    a) can reject the alternative hypothesis;
+    b) fail to reject the null hypothesis;
+    c) reject the null hypothesis;
+    ANSWER -> d) still need more information to decide about our hypotheses.
+
+```{r,warnings=FALSE,message=FALSE}
+    library(BSDA)
+    
+```
+11. True or False. If the correlation coefficient of predictor and response variables is negative one, then their  coefficient of determination is 1. 
+ANSWER: True, because -1 ^2 = 1
+
+12. True or False. If the errors  shows a right-skewed distribution on a simple linear regression then it suggests a violation of the normality of errors.
+ANSWER: True, because it is not a normal distribution. 
+
+
+13. True or False. The correlation between $\hat{y}$ and residuals($e$) is equal to 1.
+ANSWER: False
+
+14. True or False. The correlation between $\hat{y}$ and $X$ is equal to 1.
+ANSWER: True
+
+
+# Part 2: Worked-Out R Examples
+
+### Example 1: Confidence Interval for Mean with Summary Statistics
+Over the three-day period from April 1 to April 3, 2017, a national poll surveyed 1500 American households to gauge their levels of discretionary spending. The question asked was how much the respondent spent the day before; not counting the purchase of a home, motor vehicle, or normal household bills. For these sampled households, the average amount spent was \$95 with a standard deviation of s = \$185. Find a 95\% confidence interval for the true average amount spent by American households.
+
+- R code
+```{r,warnings=FALSE,message=FALSE}
+    library(BSDA)
+    tsum.test(mean.x = 95, s.x = 185, n.x = 15)
+```
+
+
+ 
+### Example 2: Test if Two Means are Equal Using Summary Statistics
+How do drivers react to sudden large increases in the price of gasoline? To help answer the question, a statistician recorded the speeds of cars as they passed a large service station. He recorded the speeds (mph) in the same location after the service station sign showed that the price of gasoline had risen by 15 cents. Can we conclude that the speeds differ?
+The summary statistics are as follows:
+Before price increase: n=12, mean=33.33, sd=4.45
+After price increase: n=12, mean=31.4,sd=3.48
+
+- R code
+    ```{r,warnings=FALSE,message=FALSE}
+    library(BSDA)
+    tsum.test(mean.x = 33.33, s.x = 4.45, n.x=12, mean.y = 31.4, s.y = 3.48, n.y=12)
+```
+
+
+
+### Example 3: Assessing Model fit using ANOVA
+
+Exam scores of 20 random students were tracked. Along with their scores, the time spent studying were also tracked. The study wants to check if the hours spent studying has any relationship with exam scores. 
+
+With the result of ANOVA shown below, what is the f-ratio? What is the degrees of freedom of error?
+
+Analysis of Variance Table  
+Response: Exam Score
+
+ Source | df  | Sum of Sq   | Mean Sq | F | $Pr(>F)$  
+-------------|------|---------------|---------------|--------|--------------------
+ Hours | 1   | 3450.7 |   |  | 6.896e-06 ***     
+ Residual |  | 1594.3 | 88.6 |  | 
+
+ANSWER: Degrees of freedom of error = 18
+ANSWER: F-Ratio = MSR/MSE = 3450.7/88.6 = 38.95
+
+### Example 4: Confidence and Prediction Interval
+
+The trees data set consists of 31 observations of 3 numeric variables describing black cherry trees:
+The trunk girth (in)
+height (ft)
+volume (ft3)
+These metrics are useful information for foresters and scientists who study the ecology of trees. It’s fairly simple to measure tree height and girth using basic forestry tools, but measuring tree volume is a lot harder.
+
+a. What is the estimated regression equation for the volume of the tree based only on its height?
+lm(volume~height)
+y=-87.12 +1.54*x
+```{r}
+data("trees")
+str(trees)
+model_1 <- lm(Volume~Height,data=trees)
+summary(model_1)
+```
+
+b. If the height of the tree is 84 feet, what would be its estimated volume? 
+
+c. What is the 90% confidence intervals when height is equal to 84?
+```{r}
+predict(model_1,data.frame(Height=84),interval='confidence',level=.9)
+```
+d. What are the associated 99% confidence and  prediction intervals when height is equal to 84?
+```{r}
+#Predict its 99% confidence interval if tree is 84 ft.
+predict(model_1,data.frame(Height=84),interval='confidence',level=.99)
+#Predict is 99% prediction interval if tree is 84 ft.
+predict(model_1,data.frame(Height=84),interval='prediction',level=.99)
+```
+
+
+```{r}
+# R Code
+#load the data
+data(trees)
+str(trees)
+#create the model
+
+```
+
+
+### Example 5: Transformation 
+Business bankruptcies occur during downturns in economy. The data in file failed.csv shows data for each state on the number of failed businesses and the population in millions.
+
+a) Construct a scatterplot of business bankruptcies (Y) against population (X). Describe the relationship that you see. Does there appear to be some association?
+```{r}
+mydata=read.csv("failed.csv")
+with(mydata,plot(Bankruptcies~Population))
+```
+It is very concentrated in lower left region, so it is not very clear.
+
+
+b) Does the model satisfy the assumptions of SLR?
+```{r}
+fitNoLog=lm(mydata$Bankruptcies~mydata$Population)
+```
+Given these four plots- No, it does not.
+
+c) Find the logarithm of each data value, both for population and for business bankruptcies.
+```{r}
+mydata$lBankruptcies=log(mydata$Bankruptcies)
+mydata$lPopulation=log(mydata$Population)
+```
+d) Construct a scatterplot of the logarithms and describe the relationship.
+```{r}
+with(mydata,plot(mydata$lBankruptcies~mydata$lPopulation))
+```
+
+e) Does the model satisfy the assumptions of SLR?
+```{r}
+fitLog=lm(mydata$lBankruptcies~mydata$lPopulation)
+plot(fitLog)
+```
+Given these four plots- residuals are scattered, some how a normal distribution, some how a straight line, and no point that is a high leverage point. Yes, it satifies the assumption of SLR.
+
+
+
+### GOOD LUCK
