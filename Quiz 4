@@ -1,0 +1,263 @@
+---
+title: "Quiz 4"
+output:
+  pdf_document: default
+  html_document: default
+date: "2024-02-29"
+---
+
+### Question 1
+A simple random sample of 100 observations was taken from a large population. The sample mean and the standard deviation were determined to be 80 and 14 respectively. The standard error of the mean is
+```{r}
+sample_mean <- 80
+sample_sd <- 14
+sample_size <- 100
+sem <- sample_sd / sqrt(sample_size)
+print(sem)
+```
+
+### Question 2
+If two independent large samples are taken from two different populations, the sampling distribution of the difference between the two sample means:
+* will have a variance of one
+* will have a mean of approximately zero
+* can be approximated by a Exponential distribution
+* can be approximated by a normal distribution (CORRECT)
+
+### Question 3
+The purpose of statistical inference is to provide information about the
+* mean of the sample based upon the mean of the population
+* population based upon information contained in the sample (CORRECT)
+* sample based upon information contained in the population
+* population based upon information contained in the population
+
+### Question 4
+If a hypothesis is not rejected at the 5% level of significance, it
+* must be rejected at the 10% level
+* will sometimes be rejected at the 1% level
+* will also not be rejected at the 1% level (CORRECT)
+* will always be rejected at the 1% level
+
+### Question 5
+In a sample of 400 voters, 360 indicated they favor the incumbent governor. The 95% confidence interval of voters not favoring the incumbent is
+```{r}
+p <- 40 / 400
+n <- 400
+confidence_level <- 0.95
+z <- qnorm(1 - (1 - confidence_level) / 2)
+confidence_interval <- p + c(-1, 1) * z * sqrt(p * (1 - p) / n)
+print(confidence_interval)
+```
+
+### Question 6
+The degrees of freedom for a contingency table with 12 rows and 12 columns is
+df = (c -1) x (r - 1)
+df = (12 - 1 ) x (12 - 1)
+```{r}
+11*11
+```
+
+### Question 7 
+As the number of degrees of freedom for a t distribution increases, the difference between the t distribution and the standard normal distribution
+* stays the same
+* None of the alternatives are correct
+* becomes larger
+* becomes smaller (CORRECT)
+
+### Question 8 
+In hypothesis testing, the null hypothesis can be rejected with 100% confidence level.
+ANSWER: False
+
+### Question 9 
+When the level of confidence decreases, the margin of error
+* shows more variability
+* becomes smaller (CORRECT)
+* becomes larger
+* stays the same
+
+### Question 10 
+When developing an interval estimate for the difference between two sample means, with sample sizes of n1 and n2,
+* n1 and n2 can be of different sizes. (CORRECT)
+* n1 must be equal to n2
+* n1 must be larger than n2
+* n1 must be smaller than n2
+
+### Question 11
+The following random sample from a population whose values were normally distributed was collected: 10, 8, 11 and 11.
+The 95% confidence interval for population mean is
+```{r}
+# Set the sample mean and sample standard deviation
+q11 <- c(10, 8, 11, 11)
+sample_mean <- mean(q11)
+sample_sd <- sd(q11)
+sample_size <- length(q11)
+z <- qt(p = .025, df = 3)
+se <- sample_sd / sqrt(sample_size)
+confidence_interval = sample_mean + c(-1, 1) * z * se
+print(confidence_interval)
+```
+
+### Question 12
+In order to determine an interval for the mean of a population with unknown standard deviation a sample of 81 items is selected. The mean of the sample is determined to be 23. The number of degrees of freedom for reading the t value is
+```{r}
+sample_size <- 81
+df <- sample_size - 1
+print(df)
+```
+
+### Question 13
+If we are interested in testing whether the proportion of items in population 1 is larger than the proportion of items in population 2, the
+* null hypothesis should state P1 - P2 > 0
+* alternative hypothesis should state P1 - P2 > 0 (CORRECT)
+* alternative hypothesis should state P1 - P2 < 0
+* null hypothesis should state P1 - P2 < 0
+
+### Question 14
+From a population with a variance of 900, a sample of 225 items is selected. At 95% confidence, the margin of error is
+```{r}
+population_variance <- 900
+sample_size <- 225
+confidence_level <- 0.95
+df <- sample_size - 1
+t_score <- qt(1 - (1 - confidence_level) / 2, df)
+margin_of_error <- t_score * sqrt(population_variance / sample_size)
+print(margin_of_error)
+```
+
+### Question 15 
+Salary information regarding male and female employees of a large company is shown below.
+________|Male | Female
+________|________|________
+Sample size | 64 | 36
+Mean salary (in $1000) | 44 | 41
+Population variance | 128 | 72
+The 95% confidence interval for the difference between the means of the two populations is
+```{r}
+# Set the sample means, population variances, and sample sizes
+sample_mean_male <- 44
+sample_mean_female <- 41
+population_variance_male <- 128
+sample_size_male <- 64
+population_variance_female <- 72
+sample_size_female <- 36
+
+# Set the confidence level and corresponding t-score
+confidence_level <- 0.95
+df <- sample_size_male + sample_size_female - 2
+t_score <- qt(1 - (1 - confidence_level) / 2, df)
+
+# Calculate the point estimate
+point_estimate <- sample_mean_male - sample_mean_female
+
+# Calculate the standard error of the point estimate
+se <- sqrt(population_variance_male / sample_size_male + population_variance_female / sample_size_female)
+
+# Calculate the confidence interval
+confidence_interval = point_estimate + c(-1, 1) * t_score * se
+
+# Print the result
+print(confidence_interval)
+```
+
+### Question 16 
+A random sample of 121 automobiles traveling on an interstate showed an average speed of 65 mph and standard deviation of 22 mph. The standard error of the mean is
+```{r}
+# Set the sample mean and standard deviation
+sample_mean <- 65
+sample_sd <- 22
+sample_size <- 121
+
+# Calculate the standard error of the mean
+sem <- sample_sd / sqrt(sample_size)
+
+# Print the result
+print(sem)
+```
+
+### Question 17 
+After computing a confidence interval, the user believes the results are meaningless because the width of the interval is too large. Which one of the following is the best recommendation?
+* Decrease the sample size.
+* Reduce the population variance.
+* Increase the level of confidence for the interval.
+* Increase the sample size. (CORRECT)
+
+### Question 18 
+Salary information regarding male and female employees of a large company is shown below.
+________|Male | Female
+________|________|________
+Sample size |64 | 36
+Mean salary (in $1000) | 44 | 41
+Population variance | 128 | 72
+At 95% confidence, the conclusion is the
+```{r}
+# Set the sample means, population variances, and sample sizes
+sample_mean_male <- 44
+sample_mean_female <- 41
+population_variance_male <- 128
+sample_size_male <- 64
+population_variance_female <- 72
+sample_size_female <- 36
+
+# Set the confidence level and corresponding t-score
+confidence_level <- 0.95
+df <- sample_size_male + sample_size_female - 2
+t_score <- qt(1 - (1 - confidence_level) / 2, df)
+
+# Calculate the point estimate
+point_estimate <- sample_mean_male - sample_mean_female
+
+# Calculate the standard error of the point estimate
+se <- sqrt(population_variance_male / sample_size_male + population_variance_female / sample_size_female)
+
+# Calculate the confidence interval
+confidence_interval = point_estimate + c(-1, 1) * t_score * se
+
+# Check if the confidence interval contains 0
+if (0 %in% confidence_interval) {
+  conclusion <- "salaries of males and females are equal"
+} else if (point_estimate > 0) {
+  conclusion <- "average salary of males is significantly greater than females"
+} else {
+  conclusion <- "average salary of males is significantly lower than females"
+}
+
+# Print the result
+print(conclusion)
+```
+* average salary of males is significantly greater than females
+* salaries of males and females are equal
+* average salary of males is significantly lower than females
+* None of these alternatives is correct. (CORRECT)
+
+### Questiom 19 
+The starting salaries of individuals with an MBA degree are normally distributed with a mean of $40,000 and a standard deviation of $5,000. What is the probability that a randomly selected individual with an MBA degree will get a starting salary of at least $47,500?
+```{r} 
+# Set the mean and standard deviation
+mean_salary <- 40000
+sd_salary <- 5000
+
+# Calculate the probability
+prob <- pnorm(47500, mean = mean_salary, sd = sd_salary, lower.tail = FALSE)
+
+# Print the result
+print(prob)
+```
+
+### Question 20 
+Which statistical test is appropriate for comparing two variances?
+* F-test (COREECT)
+* T-test
+* Z-test
+* P-test
+* Test of independence
+
+
+
+
+
+
+
+
+
+
+
+
