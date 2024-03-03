@@ -1,0 +1,235 @@
+---
+title: "STAT E-109 Section Week 5"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+``` 
+
+This is an R Markdown document for Section Week 5.
+
+# Part 1: Thought Questions
+
+### True or False
+
+1. The correlation between the predictor and response variables is exactly the same as its coefficient of determination.
+
+REMEMBER: covariance(x,y)/ (sd * x)* (sd*y)
+
+$$r_{xy}=\frac{covariance_{xy}}{s_x\times s_y}$$
+
+$$R^2=\frac{SSR}{SST}$$
+
+```{r,eval=TRUE}
+#r code here
+
+```
+Notes:
+
+* Low r-square does not necessary mean bad for the model. It simply explains that the scatter around the regression line.
+* Similarly, high r-square does not necessary mean good for the model. 
+
+```{r,eval=TRUE}
+#r code here
+x = c(1,2,3,4)
+y = c(1,2,3,10)
+model <- lm(y~x)
+summary(model)
+```
+
+ANSWER: 0.784 r-squared with p-values of 0.402 and 0.115 the regression does not hold because it is greater than our regular alpha value of .5, so we fail to reject the null. Beta 1 can be equal to zero.
+
+2. When the regression line is a perfect fit, all predicted values equal observed values.
+
+ANSWER: True
+
+
+3. If SSR = SSE, then the regression line is a perfect fit. 
+
+ANSWER: True
+
+
+4. SST tells us how much variation there is in the dependent variable. 
+
+ANSWER: True
+
+5. If the correlation is negative, this indicates that as the predictor variable increases, the response variable also increases.
+
+ANSWER: False
+
+6. In a regression ANOVA table, a higher MSR leads to a bigger F-statistic.
+
+ANSWER: True
+
+### Some Explanations
+
+7. If SSE is 30 and SSR is 10, what is the coefficient of determination?
+
+coefficient of determination= 
+
+ANSWER: 0.25
+
+8. In simple linear regression, how are the degrees of freedom of errors and predictor variable determined?
+n-k-1
+n-1-1
+n-2
+df of predictor = k 
+df of predictor = 1
+
+# Part 2: ANOVA
+9. ANOVA Problem Set #1
+
+This data set consists of 31 observations of 3 numeric variables describing black cherry trees:
+The trunk girth (in)
+height (ft)
+volume (ft3)
+These metrics are useful information for foresters and scientists who study the ecology of trees. It’s fairly simple to measure tree height and girth using basic forestry tools, but measuring tree volume is a lot harder.
+
+Using ANOVA function, what is r-squared? Is girth statistically significant?
+
+```{r}
+# R Code
+#load the data
+data(trees)
+str(trees)
+#create the model
+model_1 <- lm(Volume ~ Girth, data = trees)
+#display anova
+anova(model_1)
+7581.8/(7581.8 + 524.3)
+```
+
+
+10. Using the data about beer consumption and blood alcohol level below, using ANOVA, what is the coefficient of determination? 
+
+Student | Beers | BAL
+-----|---|---
+1 | 5 | 0.10
+2 | 2 | 0.03  
+3 | 9 | 0.19  
+4 | 8 | 0.12 
+5 | 3 | 0.04  
+6 | 7 | 0.095 
+7 | 3 | 0.07 
+8 | 5 | 0.06  
+9 | 3 | 0.02 
+10 | 5 | 0.05
+
+```{r}
+# R Code
+#load the data
+Beers <- c(5, 2, 9, 8, 3, 7, 3, 5, 3, 5)
+BAL <- c(0.10, 0.03, 0.19, 0.12, 0.04, 0.095, 0.07, 0.06, 0.02, 0.05)
+BB<- data.frame(Beers, BAL)
+#create the model
+model_BB<-lm(BB$BAL~BB$Beers)
+#execute anova function
+anova(model_BB)
+```
+
+
+
+
+
+# Part 3: Regression Line
+
+### Example 1: Linear Regression
+11. The following table gives the size of the floor area (ha) and the price ($A000), for 15 houses sold in the Canberra (Australia) suburb of Aranda in 1999.
+
+area | price
+----|-------
+694 | 192.0
+905 | 215.0
+802 | 215.0
+1366 | 274.0
+716 | 112.7
+963 | 185.0
+821 | 212.0
+714 | 220.0
+1018 | 276.0
+887 | 260.0
+790 | 221.5
+696 | 255.0
+771 | 260.0
+1006 | 293.0
+1191 | 375.0 
+
+The data predicted the price of a house based on its floor area. The mean floor area is 889.33, and the standard deviation is 193.93. The mean price is 237.75, and the standard deviation is 59.01. The correlation between the predictor and response variables is 0.617. 
+
+a. Identify the independent and dependent variables.
+
+b. What is the null hypothesis? What is the alternative hypothesis? 
+
+c. What is the slope of the regression line? 
+$$slope=r\frac{s_{price}}{s_{floor}}$$
+
+ANSWER: 0.19/0.1878 
+
+```{r}
+#R Code
+#load the data.
+area <- c(694, 905,802,1366, 716, 963, 821, 714, 1018, 887, 790, 696, 771,1006, 1191)
+price <- c(192, 215, 215, 274, 112.7, 185, 212, 220, 276, 260, 221.5, 255,260, 293, 375)
+data <- data.frame(area, price)
+
+# c.
+model<- lm(data$price~data$area)
+summary(model)
+```
+
+d. With confidence level at 95\%, can we reject the null hypothesis? 
+
+
+e. Also, what is the linear model without the intercept?
+
+```{r}
+#execute summary command to get the linear equation without intercept
+
+```
+
+
+
+
+```{r}
+#Load the data.
+.617*
+area <- c(694, 905,802,1366, 716, 963, 821, 714, 1018, 887, 790, 696, 771,1006, 1191)
+price <- c(192, 215, 215, 274, 112.7, 185, 212, 220, 276, 260, 221.5, 255,260, 293, 375)
+data <- data.frame(area, price)
+```
+
+
+### Example 2: Linear Regression
+12. Using the data about beer consumption and blood alcohol level in #10, answer the following questions:
+
+a. Identify the independent and dependent variables.
+b. What is the null hypothesis? What is the alternative hypothesis? 
+
+c. What is the slope of the regression line? 
+ANSWER:  0.019200 
+
+```{r}
+#R Code
+Beers <- c(5, 2, 9, 8, 3, 7, 3, 5, 3, 5)
+BAL <- c(0.10, 0.03, 0.19, 0.12, 0.04, 0.095, 0.07, 0.06, 0.02, 0.05)
+BB<- data.frame(Beers, BAL)
+#create the model
+model_BB<-lm(BB$BAL~BB$Beers)
+
+summary(model_BB)
+```
+
+
+
+d. With confidence level at 95\%, can we reject the null hypothesis? 
+
+Answer: The p-value of 0.005953 is less than the alpha level of 0.05 we reject the null hypothesis. 
+e. Also, what is the linear model without the intercept?
+
+```{r}
+#R Code
+model_BB_2 <-lm(BB$BAL~ -1+ BB$Beers)
+summary(model_BB_2)
+```
+
