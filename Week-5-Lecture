@@ -1,0 +1,73 @@
+#Week-5 
+library(DAAG)
+library(dplyr)
+library(ggplot2)
+
+# Simple linear regression
+str(roller)
+roller %>% ggplot(aes(x= weight, y = depression)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = 0) +
+  ggtitle('Depression Vs Roller Weight',
+          'Source: roller data from DAAG')
+
+# depression = y axis (dependent var), weight = x axis (independent var)
+m1 <- lm(depression ~ weight, roller)
+summary(m1)
+par(mfrow = c(2,2))
+plot(m1)
+par(mfrow = c(1,1))
+#Below for calibrating our eyes to see what normal plots look like 
+qreference(residuals(m1), nrep=8, nrows=2)
+anova(m1)
+
+# Without intercept
+roller %>% ggplot(aes(x= weight, y = depression)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = 0, formula=y~x-1) + #formula=y~x-1 means you don't need an intercept
+  ggtitle('Depression Vs Roller Weight',
+          'Source: roller data from DAAG')
+m1 <- lm(depression ~ -1 + weight, roller)
+summary(m1)
+
+par(mfrow = c(2,2))
+plot(m1)
+anova(m1)
+par(mfrow = c(1,1))
+
+# Prediction 
+predict(m1, 
+        data.frame(weight = c(7, 8, 9)))
+
+# Output: Weight 7 occurs about 16.5% 
+
+predict(m1, 
+        data.frame(weight = c(7, 8, 9)),
+        interval = 'prediction')
+
+predict(m1, 
+        data.frame(weight = c(7, 8, 9)),
+        interval = 'confidence')
+
+
+# Plot with CI & PI
+
+p <- predict(m1, interval = 'prediction')
+data <- cbind(roller, p)
+
+ggplot(data, aes(x = weight, y = depression)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  geom_line(aes(y= lwr),
+            color = 'red', lwd = 1,
+            linetype = 'dashed') +
+  geom_line(aes(y= upr),
+            color = 'red', lwd = 1,
+            linetype = 'dashed')
+
+
+
+
+
+
+
