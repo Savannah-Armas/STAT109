@@ -1,0 +1,117 @@
+------------------------------------------------------------------------------------------
+          LECTURE
+------------------------------------------------------------------------------------------
+# Week 9 
+
+#Week-9
+# Video: https://youtu.be/mMm8Xt0HUkI
+library(DAAG)
+library(datasets)
+library(ggplot2)
+library(dplyr)
+library(psych)
+library(caret)
+library(pROC)
+
+# Read binary.csv data file
+mydata <- read.csv('https://raw.githubusercontent.com/bkrai/Statistical-Modeling-and-Graphs-with-R/main/binary.csv')
+str(mydata)
+mydata$admit <- as.factor(mydata$admit)
+mydata$rank <- as.factor(mydata$rank)
+
+# Split data
+set.seed(1234)
+ind <- sample(2, nrow(mydata), replace = T, prob = c(0.8, 0.2))
+train <- mydata[ind == 1,]
+test <- mydata[ind == 2,]
+
+# Logistic regression
+m <- glm(admit~. , data = train, family = 'binomial' )
+summary(m)
+
+#Null deviance: Where response is predicted by the model with just intercept, no independent variables
+#Residual deviance: Where response is predicted by everything in model
+#If Null deviance is almost the same as residual deviance, it shows adding the new variables has little effect
+#Ideally the Null deviance > Residual deviance, because this shows improved strenght 
+
+m1 <- glm(admit~. -gre, data = train, family = 'binomial' )
+summary(m1)
+
+#When duplicating the model after removing the gre variable, residual deviance increases and AIC decreased slightly 
+#Main point to draw from this example- if a variable is not statistically significant we drop it
+
+# IN CONSOLE: > termplot(m) 
+  #Captures change at a given variable (x- axis) when other variables are held constant at their mean
+  #"How much contribution is brought by each variable"
+
+# Predictions 
+# Predictions - Test (Error = %)
+p1 <- predict(m, train, type = 'response')
+ #IN CONSOLE: > hist(p1)
+#IN CONSOLE: > table(train$admit)
+pred1 <- ifelse(p1>0.5, 1, 0)
+#IN CONSOLE: > table(pred1, train$admit)
+table(Predicted = pred1, Actual = train$admit)
+#IN CONSOLE: > (205+27)/325
+  #Result: tihs model is accurate about 71.38% of the time
+#IN CONSOLE: > 1 - (205+27)/325
+  #RESULT: 0.2861 error rate in the training data 
+
+# Predictions - Test (Error = 30.7%)
+p2 <- predict(m, test, type = 'response')
+pred2 <- ifelse(p2>0.5, 1, 0)
+table(Predicted = pred2, Actual = test$admit) #Also called confusion matrix or decision matrix
+#IN CONSOLE: > (48+4)/75
+#Result: tihs model is accurate about 69.3% of the time
+#IN CONSOLE: > 1 - (48+4)/75
+#RESULT: 0.3066 error rate in the training data 
+
+# Over fitting the model occurs when error rate goes up i.e. 20% to 80%
+
+------------------------------------------------------------------------------------------
+          SECTION
+------------------------------------------------------------------------------------------
+
+You can also embed plots, for example:
+1) The wifilocalization data uses 7 different wifi signals to determine which room a device is in (locations
+1-4). Use the wifilocalization data and fit logistic regression model, to determine if the device is in room
+3 or not. Find the binary categorical outcome (location=3 or not) using seven WiFi signals strengths
+as predictors in the model. Produce summary of the model, describe which attributes appear to be
+significantly associated with the categorical outcome in this model.
+
+#Download Data
+wifiLocalization = read.table("wifilocalization.txt", sep="\t", header = TRUE, quote ="")
+#View(wifiLocalization)
+wifiLocalizationTemp = wifiLocalization[]
+wifiLocalizationTemp[wifiLocalizationTemp$Location !=3, ]$Location <- 0
+wifiLocalizationTemp[wifiLocalizationTemp$Location ==3, ]$Location <- 1
+#View(wifiLocalizationTemp)
+logistic = glm(Location~., family="binomial", data = wifiLocalizationTemp)
+summary(logistic)
+
+2) Split the data in testing and training sets; put 50% in training and 50% in testing. Create a model
+based on just training data, then test its accuracy with test data
+set.seed(1234)
+shuffled_wifilocalizationTemp = wifiLocalizationTemp[sample(1:nrow(wifiLocalizationTemp)), ]
+train = shuffled_wifilocalizationTemp[0:1000, ]
+test = shuffled_wifilocalizationTemp[1001:2000, ]
+training_model = glm(Location~., data = train, family = "binomial")
+summary(training_model)
+
+actualValues = test$Location
+predictions = predict(training_model, test, type='response')
+predictionValues = ifelse(predictions > 0.5, 1, 0)
+
+3) create confusionMatrix with actual and predicted values
+matrix = table(predicted = predictionValues, Actual = actualValues)
+matrix
+
+4) calculate accuracy, sensitivity and specificity for the values from the above matrix
+#Accuracy = (TP + TN)/Total = (704 + 86)/1000
+(704 + 86)/1000
+
+#sensitivity = TP/(TP + FN) = 86/(86 + 166)
+86/(86 + 166)
+
+#specificity = TN/(TN + FP)
+704/(704 + 44)
