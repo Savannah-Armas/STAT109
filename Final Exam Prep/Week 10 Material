@@ -1,0 +1,219 @@
+------------------------------------------------------------------------------------------
+          LECTURE
+------------------------------------------------------------------------------------------
+
+#Week-10
+# Video: https://youtu.be/ftjNuPkPQB4
+library(DAAG)
+library(datasets)
+library(ggplot2)
+library(dplyr)
+library(psych)
+library(caret)
+library(pROC)
+library(nnet)
+
+# Data
+mydata <- read.csv('https://raw.githubusercontent.com/bkrai/Statistical-Modeling-and-Graphs-with-R/main/binary.csv')
+
+# Split data
+set.seed(1234)
+ind <- sample(2, nrow(mydata), replace = T, prob = c(0.8, 0.2))
+train <- mydata[ind == 1,]
+test <- mydata[ind == 2,]
+
+# Logistic regression
+m <- glm(admit~. , data = train, family = 'binomial' )
+
+# ROC
+p1 <- predict(m, train, type = 'response')
+r <- multiclass.roc(train$admit, p1, percent = TRUE)
+roc <- r[['rocs']]
+r1 <- roc[[1]]
+plot.roc(r1)
+plot.roc(r1,
+         print.auc = T,
+         print.thres = T,
+         col = 'red',
+         lwd =2)
+#RESULTS: When p is less than 0.3 accept that applicant, and when it is more reject that applicant
+
+#Best threshold
+coords(r1, "best", ret="threshold", transpose = FALSE) 
+
+# Why logistic regression?  
+gpa <- runif(500, 3, 3.6)
+gpa <- append(gpa, runif(500, 3.4, 4))
+outcome <- rep(0, 500)
+outcome <- append(outcome, rep(1, 500))
+data <- data.frame(gpa, outcome)
+
+
+data %>% ggplot(aes(x = gpa, y = factor(outcome), fill = factor(outcome))) +
+  geom_boxplot() +
+  ggtitle('Box plot: admitted Vs rejected',
+          'Simulated data') 
+
+data %>% 
+  ggplot(aes(x=gpa, y=outcome)) +
+  geom_point() 
+
+# Multinomial  
+mydata <- read.csv('https://raw.githubusercontent.com/bkrai/Statistical-Modeling-and-Graphs-with-R/main/Cardiotocographic.csv')
+str(mydata)
+mydata$NSP <- as.factor(mydata$NSP)
+mydata$NSP <- relevel(mydata$NSP, ref = '1')
+
+# Split data
+set.seed(1234)
+ind <- sample(2, nrow(mydata), replace = T, prob = c(0.8, 0.2))
+train <- mydata[ind == 1,]
+test <- mydata[ind == 2,]
+
+# Model
+m <- multinom(NSP~ . , data = train)
+m <- multinom(NSP~ . -MSTV -MLTV -Min -Nzeros -Tendency -Width -Max - Mode, data = train)
+
+#2-tailed z test
+z <- summary(m)$coefficients/summary(m)$standard.errors
+(1 - pnorm(abs(z), 0, 1)) * 2
+
+# Predict
+p <- predict(m, train, type = 'class')
+confusionMatrix(p, train$NSP)
+
+# > 293/408
+# > (293+14)/408
+# > table(train$NSP)
+# > t <- table(train$NSP)
+# > prop.table(t)
+
+# Predict
+p <- predict(m, test, type = 'class')
+confusionMatrix(p, test$NSP)
+
+# Predict
+p <- predict(m, test, type = 'prob')
+p
+r <- multiclass.roc(test$NSP, p, precent = T)
+r
+rs <- r[['rocs']]
+rs
+r1 <- rs[[1]][[2]]
+r1
+r2 <- rs[[2]][[2]]
+r2
+r3 <- rs[[3]][[2]]
+r3
+plot(r1)
+plot(r2, add = T, col = 'blue')
+plot(r3, add = T, col = 'pink')
+
+------------------------------------------------------------------------------------------
+          SECTION
+------------------------------------------------------------------------------------------
+
+Libraries used
+library(pROC)
+library(nnet)
+library(caret)
+library(foreign)
+library(e1071)
+
+For this example we will be making use of the Titanic Dataset from Kaggle. Kaggle has a data modeling
+competition going on for this dataset, for unlimited duration. The competition is meant to be a starting
+point for beginner data scientists, so feel free to check it out and give it a try yourself!
+We will be working with the training dataset only, as it has a reference column for our dependent variable for
+us to work off of.
+
+titanic.train <- read.csv('./titanic_train.csv')
+str(titanic.train)
+
+For this example, our dependent variable will be Survived (1 = Survived, 0 = Did Not Survive) and we
+will regress this variable against Pclass, Passenger Class, (1 = 1st class, 2 = 2nd class, 3 = 3rd class), Age,
+Passenger Age in years, Sex, Passenger Sex (male or female), and Embarked, Port of Embarkation (C =
+Cherbourg, Q = Queenstown, S = Southampton).
+
+Evaluate Model Performance
+Generate a Confusion Matrix and calculate the Accuracy, Misclassification Rate, Specificity,
+and Sensitivity of our model
+Create our logistic regression model
+train.df <- titanic.train[complete.cases(titanic.train[, c("Pclass", "Age", "Sex", "Embarked")]), ]
+glm.survived <- glm(Survived ~ Pclass + Age + Sex + Embarked, data = train.df)
+summary(glm.survived)
+
+Generate predictions and confusion matrix
+pvals <- predict(glm.survived, type = 'response')
+predictions <- as.factor(as.numeric(pvals > 0.68))
+table(predictions = predictions, reference = as.factor(train.df$Survived))
+
+Calculate all performance metrics by basic arithmetic
+# Accuracy = (True Positive + True Negative) / sample size
+(154 + 409) / (154 + 409 + 15 + 136)
+
+# Misclassification Rate = (False Positive + False Negative) / sample size
+(135 + 15) / (154 + 409 + 15 + 136)
+
+# Sensitivity = (True Positive) / (True Positive + False Negative)
+155 / (154 + 136)
+
+# Specificity = (True Negative) / (True Negative + False Positive)
+409 / (409 + 15)
+
+Now to see why all this arithmetic is pointless for us to do
+confusionMatrix(predictions, reference = as.factor(train.df$Survived), positive = '1')
+
+Create an AUC - ROC Curve to determine ideal cutoff value
+Create roc object and plot it using library(pROC)
+r <- multiclass.roc(train.df$Survived, pvals, percent = TRUE)
+
+roc <- r[['rocs']]
+r1 <- roc[[1]]
+plot.roc(r1,
+col = 'red',
+print.auc = TRUE,
+auc.polygon = TRUE,
+auc.polygon.col = 'lightblue',
+grid = c(0.1, 0.2),
+grid.col = c('green', 'red'),
+print.thres = TRUE,
+main = 'AUC - ROC Curve')
+
+Determine the ideal cutoff value, re-calculate predictions, and check accuracy
+cutoff <- coords(r1, "best", ret = "threshold", transpose = FALSE)$threshold
+cutoff
+
+pvals <- predict(glm.survived, type = 'response')
+predictions <- as.factor(as.numeric(pvals > cutoff))
+confusionMatrix(predictions, reference = as.factor(train.df$Survived))
+
+Multinomial Logistic Regression
+For this example, we will be making use of a demo dataset from UCLA’s public online examples. The dataset
+is called hsbdemo and it contains variables on 200 students. The outcome variable is prog, program type.
+Read in the data. . . so we know exactly what the heck we’re dealing with here:
+hsbdemo <- read.dta("https://stats.idre.ucla.edu/stat/data/hsbdemo.dta")
+unique(hsbdemo$prog)
+
+str(hsbdemo)
+
+Set our reference category and slit our data
+hsbdemo$prog <- as.factor(as.numeric(hsbdemo$prog))
+relevel(hsbdemo$prog, ref = '1')
+
+idx <- sample(2, nrow(hsbdemo), replace = T, prob = c(0.7, 0.3))
+hsb.train <- hsbdemo[idx == 1, ]
+hsb.test <-hsbdemo[idx == 2, ]
+
+Create our multinomial regression model. Regress prog against: read, write, math, science, and honors
+multi.glm <- multinom(prog ~ read + write + math + science + honors, data = hsb.train)
+
+summary(multi.glm)
+
+Calculate our coefficient probabilities
+z.scores <- summary(multi.glm)$coefficients / summary(multi.glm)$standard.errors
+(1 - pnorm(abs(z.scores), 0, 1)) * 2
+
+Make predictions
+p <- predict(multi.glm, hsb.train, type = 'class')
+confusionMatrix(p, hsb.train$prog)
+
