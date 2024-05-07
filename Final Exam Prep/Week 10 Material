@@ -94,17 +94,11 @@ confusionMatrix(p, test$NSP)
 
 # Predict
 p <- predict(m, test, type = 'prob')
-p
 r <- multiclass.roc(test$NSP, p, precent = T)
-r
 rs <- r[['rocs']]
-rs
 r1 <- rs[[1]][[2]]
-r1
 r2 <- rs[[2]][[2]]
-r2
 r3 <- rs[[3]][[2]]
-r3
 plot(r1)
 plot(r2, add = T, col = 'blue')
 plot(r3, add = T, col = 'pink')
