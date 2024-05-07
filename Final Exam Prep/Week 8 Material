@@ -29,7 +29,7 @@ test <- Salaries[ind == 2,]
 m <- lm(salary ~ ., trg)
 summary(m)
 
-#
+# Trying all possible variable combinations - 31 models
 (all <- ols_step_all_possible(m)) 
 
 model <- stepAIC(m, direction = "both", trace = F)
@@ -41,8 +41,8 @@ c <- cor(p, test$salary)
 (R2 <- c^2)
 
 # Interaction
-m <- lm(salary ~ .*., Salaries)
-m <- lm(salary ~ . + , Salaries)
+m <- lm(salary ~ .*., Salaries) # .*. includes all interaction vars. 
+m <- lm(salary ~ . + disciplineB:yrs.service, Salaries) # includes selected interaction vars. 
 
 # In Console: head(p)
 # In Console: head(test$salary)
@@ -82,12 +82,12 @@ chart.Correlation(data)
 m <- lm(porosity ~ . , data)
 summary(m)
 
-m <- lm(porosity ~ . -E, data)
+m <- lm(porosity ~ . -E, data) #Removing highly correlated var
 summary(m)
 vif(m)
 AIC(m)
 
-m <- lm(porosity ~ . -E - D -A, data)
+m <- lm(porosity ~ . -E - D -A, data) #Removing additional highly correlated vars
 summary(m)
 vif(m)
 AIC(m)
@@ -236,160 +236,3 @@ predict(
         region="northwest"
     )
 )
-```
----
-title: "Practice Quiz Answers"
-output: pdf_document
-date: '2022-04-22'
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
-library(ISLR)
-library(rpart)
-library(rpart.plot)
-library(mlbench)
-library(caret)
-library(MASS)
-library(DAAG)
-library(ISLR)
-library(foreign)
-library(e1071)
-library(pROC)
-library(lattice)
-library(lime)
-library(dplyr)
-```
-
-
-## Practice Quiz Answers 
-
-# Question 1: 
-
-Which of the following methods could be applied to detect a binary choice? 
-A. Logistic Regression
-C. Classification Tree
-D. Random Forest 
-
-# Question 2: 
-
-For which type of models are ROC curves appropriate? 
-C. Classification Tree - ROC curves are appropriate for models that have a binary dependent variable. 
-
-# Question 3: 
-
-In a classification tree, where is the most important independent variable located? 
-B. Root node 
-
-# Question 4: 
-
-What is the final prediction in a classification tree model based on? 
-B. Majority
-
-# Question 5: 
-
-What is the final prediction in a regression tree model based on? 
-A. Average
-
-# Question 6: 
-In which of the following applications can a tree-based algorithm be successfully applied? 
-A. Predicting if a football team will win, lose, or tie based on previous data 
-B. Predict the sales value of a clothing company based on previous sales 
-C. Predict the weather based on historical data 
-
-# Question 7: 
-
-The numerous trees/models in a random forest are always dependent on each other. 
-False - The models in random forest and bagging are independent of each other. The trees in extreme gradient boosting are dependent of each other. 
-
-# Question 8: 
-
-All ensemble methods (bagging, random forest, and boosting) can be used for classification and regression problems. 
-True 
-
-# Question 9: 
-
-The smaller the complexity parameter value, the smaller the tree. 
-False 
-
-# Question 10: 
-
-An individual decision tree model has less variability than a random forest model. 
-False 
-
-# Question 11:
-
-When you use bootstrap sampling, you will never choose the same data point twice. 
-False - bootstrap sampling is with replacement, so you may choose the same data point multiple times! 
-
-# Question 12: 
-
-How do you use the accuracy of the testing/training data to determine a best model? And how do you recognize when over-fitting is happening using accuracy? 
-
-You look for the highest accuracy for the TESTING data. If the model performs significantly better on the training set than the testing set, we can conclude that over-fitting is present. 
-
-# Question 13: 
-
-How is random forest similar/different from bagging? 
-
-Both Random forest and Bagging methods use bootstrap sampling to create their models; however, random forest chooses a random sample from all the independent variables to use for each tree, while bagging uses all of the independent variables for each tree. 
-
-# Question 14: 
-
-How do we consider xerror when evaluating the performance of a model? What is the relationship between xerror and complexity parameter? 
-
-Well performing models have a low xerror value. Typically, as you decrease the complexity parameter, the xerror also decreases; however, after a certain point the xerror will being to increase again. 
-
-# Question 15: 
-
-It is a classification tree, and we can predict the new passenger survived. This subset of passengers (women who were part of the upper class) represents 22% of all observations in this dataset. Additionally, if you were a woman and part of upper class, you had an overall survival probability of 94%. 
-
-```{r}
-set.seed(1234)
-ind <- sample(2, nrow(titanic), replace = T, prob = c(0.8, 0.2))
-
-train <- titanic[ind == 1,]
-test <- titanic[ind == 2,]
-
-tree <- rpart(Survived ~., data = titanic)
-rpart.plot(tree)
-printcp(tree)
-plotcp(tree)
-```
-
-
-# Question 16: 
-
-Using the 'Credit' dataset in the 'ISLR' library, develop a random forest classification model for 'Student' as a response. What are the top 3 most important variables? Note: Use set.seed(1234) and entire data for developing the model.
-
-Balance, Rating, and Limit 
-
-```{r}
-?Credit
-```
-
-
-```{r}
-data('Credit')
-mydata <- Credit
-
-ind <- sample(2, nrow(mydata), replace = T, prob = c(0.5, 0.5))
-train <- mydata[ind == 1,]
-test <- mydata[ind == 2,]
-```
-
-```{r}
-student <- train(Student ~ Balance + Income + Limit + Education + Rating, data = train, method = "rf", importance = TRUE)
-student
-```
-
-```{r}
-plot(varImp(student))
-```
-
-
-
-
