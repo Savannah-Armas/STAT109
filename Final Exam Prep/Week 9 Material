@@ -45,12 +45,16 @@ summary(m1)
   #"How much contribution is brought by each variable"
 
 # Predictions 
-# Predictions - Test (Error = %)
+# Predictions - Test (Error = 28.6%)
 p1 <- predict(m, train, type = 'response')
- #IN CONSOLE: > hist(p1)
+
+#IN CONSOLE: > hist(p1)
 #IN CONSOLE: > table(train$admit)
+
 pred1 <- ifelse(p1>0.5, 1, 0)
+
 #IN CONSOLE: > table(pred1, train$admit)
+
 table(Predicted = pred1, Actual = train$admit)
 #IN CONSOLE: > (205+27)/325
   #Result: tihs model is accurate about 71.38% of the time
