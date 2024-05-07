@@ -33,8 +33,8 @@ plot(varImp(bag))
 ba <- predict(bag,  test)
 plot(ba ~ test$medv, main = 'Predicted Vs Actual MEDV - Test data')
 # Root mean squared error = RMSE
-sqrt(mean((test$medv - ba)^2))
-cor(test$medv, ba) ^2
+sqrt(mean((test$medv - ba)^2)) #RMSE
+cor(test$medv, ba) ^2  #R-squared
 
 # RF
 set.seed(1234)
@@ -62,7 +62,7 @@ plot_features(explanation)
 set.seed(1234)
 boo <- train(medv ~ ., 
              data=train,
-             method="xgbTree", 
+             method="xgbTree",   
              trControl=cvcontrol,
              tuneGrid = expand.grid(nrounds = 500,
                                     max_depth = 3,
