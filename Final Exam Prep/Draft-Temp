@@ -1,0 +1,235 @@
+# Frequently used syntax
+mydata <- read.csv('filename.csv')
+
+These are the libraries you may need for the final exam:
+            library(rpart)
+            library(rpart.plot)
+            library(mlbench)
+            library(caret)
+            library(MASS)
+            library(DAAG)
+            library(ISLR)
+Good luck!
+----------------------------------
+Week 7
+----------------------------------
+library(DAAG)
+library(ggplot2)
+library(psych)
+library(MASS)
+----------------------------------
+
+# Scatterplot
+ggplot(dataset, aes(x=volume, y=weight, col = cover)) +
+  geom_point() 
+pairs.panels(dataset[1:3])
+
+#MLR
+m <- lm(dep var ~ indep vars, dataset)
+summary(m)
+
+#CI for coefficients
+confint(m)
+
+# log transformed
+m <- lm(log(y) ~ log(x) + log(x), dataset)
+summary(m)
+
+# Predict Values
+p <- predict(m, dataset)
+plot(p ~ dataset$x)
+cor <- cor(p, dataset$x)
+cat("The correlation of the predited model is:", cor, "\n")
+r2 <- (cor(p, dataset$x))^2
+cat("The r2 of the predited model is:", r2, "\n")
+
+# AIC & BIC
+m1 <- lm(y ~ x1 + x2, dataset)
+AICm1 <- AIC(m1)
+cat("The AIC of model 1 is:", AICm1, "\n")
+BICm1 <- BIC(m1)
+cat("The BIC of model 1 is:", AICm1, "\n")
+
+----------------------------------
+Week 8 
+----------------------------------
+library(DAAG)
+library(MASS)
+library(compositions)
+library(psych)
+library(car)
+library(PerformanceAnalytics)
+library(olsrr)
+----------------------------------
+
+# Partition
+set.seed(123)
+ind <- sample(2, nrow(dataset), replace = T, prob = c(0.5, 0.5))
+trg <- dataset[ind == 1,]
+test <- dataset[ind == 2,]
+
+m <- lm(dataset ~ ., trg)
+summary(m)
+
+# Model Step
+model <- stepAIC(m, direction = "both", trace = F)
+summary(model)
+
+----------------------------------
+Week 9 
+----------------------------------
+library(DAAG)
+library(datasets)
+library(ggplot2)
+library(dplyr)
+library(psych)
+library(caret)
+library(pROC)
+----------------------------------
+
+# Converting to factor var 
+dataset$x <- as.factor(dataset$x)
+
+# Split data
+set.seed(1234)
+ind <- sample(2, nrow(dataset), replace = T, prob = c(0.8, 0.2))
+train <- mydata[ind == 1,]
+test <- mydata[ind == 2,]
+
+# Logistic regression
+m <- glm(y~. , data = train, family = 'binomial' )
+summary(m)
+
+# Predictions - Train
+p1 <- predict(m, train, type = 'response')
+pred1 <- ifelse(p1>0.5, 1, 0)
+table(Predicted = pred1, Actual = train$admit)
+
+# Predictions - Test
+p2 <- predict(m, test, type = 'response')
+pred2 <- ifelse(p2>0.5, 1, 0)
+table(Predicted = pred2, Actual = test$admit)
+
+#Accuracy = (TP + TN)/Total = (704 + 86)/1000
+#sensitivity = TP/(TP + FN) = 86/(86 + 166)
+#specificity = TN/(TN + FP)
+
+----------------------------------
+Week 10 
+----------------------------------
+library(DAAG)
+library(datasets)
+library(ggplot2)
+library(dplyr)
+library(psych)
+library(caret)
+library(pROC)
+library(nnet)
+----------------------------------
+
+r <- multiclass.roc(train$admit, p1, percent = TRUE)
+roc <- r[['rocs']]
+r1 <- roc[[1]]
+plot.roc(r1)
+plot.roc(r1,
+         print.auc = T,
+         print.thres = T,
+         col = 'red',
+         lwd =2)
+#Best threshold
+coords(r1, "best", ret="threshold", transpose = FALSE) 
+
+# Model Multinominal
+m <- multinom(y~ . , data = train)
+
+# Roc
+p <- predict(m, test, type = 'prob')
+r <- multiclass.roc(dataset$x, p, precent = T)
+rs <- r[['rocs']]
+r1 <- rs[[1]][[2]]
+r2 <- rs[[2]][[2]]
+r3 <- rs[[3]][[2]]
+plot(r1)
+plot(r2, add = T, col = 'blue')
+plot(r3, add = T, col = 'pink')
+
+----------------------------------
+Week 11
+----------------------------------
+library(DAAG)
+library(party)
+library(rpart)
+library(rpart.plot)
+library(mlbench)
+library(pROC)
+library(tree)
+library(caret)
+----------------------------------
+
+# Tree
+tree <- rpart(y ~., data = train)
+rpart.plot(tree)
+printcp(tree)
+plotcp(tree)
+# Predict 
+p <- predict(tree, train)
+plot(p ~ train$y)
+sqrt(mean((train$y - p)^2))
+
+----------------------------------
+Week 12
+----------------------------------
+library(DAAG)
+library(mlbench)
+library(caret)
+library(e1071)
+library(lime)
+----------------------------------
+
+# Regression
+# Bagging
+set.seed(1234)
+cvcontrol <- trainControl(method="repeatedcv", 
+                          number = 5,
+                          repeats = 2,
+                          allowParallel=TRUE)
+set.seed(1234)
+bag <- train(y ~ ., 
+             data=train,
+             method="treebag",
+             trControl=cvcontrol,
+             importance=TRUE)
+plot(varImp(bag))
+
+# Plot, RMSE, R-square
+ba <- predict(bag,  test)
+plot(ba ~ test$y, main = 'Predicted Vs Actual MEDV - Test data')
+RMSE <- sqrt(mean((test$y - ba)^2)) 
+cat("The RMSE of the test model is:", RMSE, "\n")
+r2<- cor(test$y, ba) ^2  #R-squared
+cat("The R-Squared of the test model is:", r2, "\n")
+
+# Random Forest 
+set.seed(1234)
+forest <- train(y ~ ., 
+                data=train,
+                method="rf",
+                trControl=cvcontrol,
+                importance=TRUE)
+plot(varImp(forest))
+
+# Plot, RMSE, R-square
+rf <-  predict(forest,  test)
+plot(rf ~ test$y, main = 'Predicted Vs Actual MEDV - Test data')
+RMSE <- sqrt(mean((test$y - rf)^2))
+cat("The RMSE of the test model is:", RMSE, "\n")
+r2 <- cor(test$y, rf) ^2
+cat("The R-Squared of the test model is:", r2, "\n")
+
+# Explain predictions
+explainer <- lime(test[1:3,], forest, n_bins = 5)
+explanation <- explain( x = test[1:3,], 
+                        explainer = explainer, 
+                        n_features = 5)
+plot_features(explanation)
+
