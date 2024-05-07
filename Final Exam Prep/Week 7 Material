@@ -42,7 +42,9 @@ summary(lm(brainwt ~ lsize + bodywt, litters))
 #Influence on the regression coefficients
 m <- lm(weight ~ volume + area, allbacks)
 summary(m)
-dfbetas(m)
+b <- dfbetas(m)
+plot(b[,2])
+plot(b[,3])
 
 AIC(m)
 BIC(m)
@@ -69,8 +71,3 @@ BIC(m2)
 
 # Lower the AIC, the better the model
 # Lower the BIC, the better the model
-
-------------------------------------------------------------------------------------------
-          SECTION
-------------------------------------------------------------------------------------------
-none
